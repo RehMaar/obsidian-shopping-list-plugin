@@ -15,6 +15,11 @@
 	export let entries: Array<BundleEntry>;
 	export let onSave: (entries: Array<BundleEntry>) => void;
 
+	let isDoneFolded: boolean = true;
+
+	$: doneBundlesCount = entries.filter((e) => e.done).length;
+	$: doneText = doneBundlesCount == 1 ? "bundle" : "bundles";
+
 	function refreshPage() {
 		entries = [...entries]; // Trigger reactivity
 	}
@@ -56,7 +61,6 @@
 			"Are you sure you want to remove this bundle?",
 			() => {
 				entries = entries.filter((e) => e !== entry);
-				refreshPage();
 				onSave(entries);
 			},
 		).open();
@@ -68,7 +72,6 @@
 			"Are you sure you want to clear all done bundles?",
 			() => {
 				entries = entries.filter((e) => !e.done);
-				refreshPage();
 				onSave(entries);
 			},
 		).open();
@@ -80,7 +83,6 @@
 			"Are you sure you want to clear all done bundles?",
 			() => {
 				entries = entries.filter((e) => e.done);
-				refreshPage();
 				onSave(entries);
 			},
 		).open();
@@ -117,29 +119,45 @@
 		<AddShoppingBundle onFinish={addBundle} />
 	</div>
 
-	<div class="shopping-list done-list">
-		<header class="shopping-list-header">
-			<h1>Shopping List Done</h1>
-			<button
-				class="button"
-				aria-label="Clear all"
-				on:click={cleanAllDone}
-			>
-				<BrushCleaning />
-			</button>
-		</header>
-		{#each entries as bundle}
-			{#if bundle.done}
-				<ShoppingBundle
-					{bundle}
-					onDone={toggleDone}
-					onFold={toggleFold}
-					onRemove={removeBundle}
-					onItemDone={toggleItemDone}
-				/>
+	{#if doneBundlesCount > 0}
+		<div class="shopping-list done-list">
+			<header class="shopping-list-header">
+				<div
+					on:click={() => (isDoneFolded = !isDoneFolded)}
+					on:keydown={(e) =>
+						e.key === "Enter" && (isDoneFolded = !isDoneFolded)}
+					role="button"
+					tabindex="0"
+				>
+					<h1>Shopping List Done</h1>
+					<span class="done-count"
+						>({doneBundlesCount} {doneText})</span
+					>
+				</div>
+				<button
+					class="button"
+					aria-label="Clear all"
+					on:click={cleanAllDone}
+				>
+					<BrushCleaning />
+				</button>
+			</header>
+
+			{#if !isDoneFolded}
+				{#each entries as bundle}
+					{#if bundle.done}
+						<ShoppingBundle
+							{bundle}
+							onDone={toggleDone}
+							onFold={toggleFold}
+							onRemove={removeBundle}
+							onItemDone={toggleItemDone}
+						/>
+					{/if}
+				{/each}
 			{/if}
-		{/each}
-	</div>
+		</div>
+	{/if}
 </div>
 
 <style>
@@ -194,5 +212,10 @@
 
 	.button:hover {
 		color: var(--interactive-accent-hover);
+	}
+
+	.done-count {
+		font-style: italic;
+		color: var(--text-muted);
 	}
 </style>
