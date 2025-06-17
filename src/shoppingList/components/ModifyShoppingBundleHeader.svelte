@@ -1,7 +1,7 @@
 <!-- Should be in sync with ShoppingBundleHeader.svelte -->
 <!-- TODO: find a way to use the same styles everywhere! -->
 <script lang="ts">
-	import { SquarePen, SquareX } from "lucide-svelte";
+	import { SquareCheck, SquareX } from "lucide-svelte";
 
 	import type { BundleEntry } from "../../types";
 
@@ -28,7 +28,7 @@
 		/>
 	</div>
 	<button class="button" on:click={() => onSave(bundle)} aria-label="Save">
-		<SquarePen />
+		<SquareCheck />
 	</button>
 	<button
 		class="button"

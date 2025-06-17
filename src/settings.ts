@@ -5,7 +5,7 @@ export interface ShoppingPluginSettings {
 
 export const DEFAULT_SETTINGS: ShoppingPluginSettings = {
     shoppingListDir: 'ShoppingList',
-    defaultShoppingListFileName: 'ShoppingList.md',
+    defaultShoppingListFileName: 'ShoppingList.list',
 }
 
 

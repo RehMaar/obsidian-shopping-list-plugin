@@ -1,150 +1,14 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting, WorkspaceLeaf } from 'obsidian';
-import { MarkdownRenderChild, TFile } from "obsidian";
-import { TextFileView } from 'obsidian';
+import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 import { type ShoppingPluginSettings, DEFAULT_SETTINGS } from './settings';
 import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
 
 import store from "./store";
-import { Item, BundleEntry, ItemEntry } from './types';
+import { Item } from './types';
 
-import { inspect } from 'util';
-import ShoppingList from './shoppingList/components/ShoppingList.svelte';
+import { ShoppingListView } from './view';
 
 const SHOPPING_LIST_VIEW_TYPE = 'shopping-list';
-
-class ShoppingListView extends TextFileView {
-	plugin: ShoppingListPlugin;
-
-	shoppingComponent!: ShoppingList;
-	entries: Array<BundleEntry> = [];
-
-	constructor(leaf: WorkspaceLeaf, plugin: ShoppingListPlugin) {
-		super(leaf);
-		this.plugin = plugin;
-	}
-
-	async save(clear?: boolean): Promise<void> {
-		console.log("save called");
-
-
-		let file = this.app.workspace.getActiveFile();
-		if (file) {
-			await this.app.vault.modify(file, this.data);
-		} else {
-			console.log("No active file to save to!");
-		}
-	}
-
-	getViewType() {
-		return 'shopping-list';
-	}
-
-	getDisplayText() {
-		return 'Shopping List';
-	}
-
-	getViewData(): string {
-		console.log(`getViewData ${this.data}`);
-		return this.data;
-	}
-
-	setViewData(data: string, clear: boolean): void {
-		console.log("setViewData");
-		console.log(`clear: ${clear} data: ${data}`);
-
-		const entries = this.parseViewData(data);
-		this.entries = entries;
-		this.shoppingComponent.$set({ entries: entries });
-	}
-
-	clear() { }
-
-	async onLoadFile(file: TFile): Promise<void> {
-		console.log(`onLoadFile ${file.path}`);
-		this.data = await this.app.vault.read(file);
-		console.log(`loaded ${this.data}`);
-		let entries = this.parseViewData(this.data);
-		this.shoppingComponent = new ShoppingList({
-			target: this.contentEl,
-			props: {
-				entries: entries,
-				onSave: (entries) => {
-					this.data = entries.map((entry) => this.bundleToString(entry)).join("\n");
-					this.save();
-				},
-			}
-		});
-
-	}
-
-	async onUnloadFile(file: TFile): Promise<void> {
-		console.log(`onUnloadFile ${file.path}`);
-		this.shoppingComponent.$destroy();
-		this.data = "";
-	}
-
-	bundleToString(entry: BundleEntry): string {
-		let foldedMark = entry.folded ? "+" : "-";
-		let bundleString = foldedMark + ` [${entry.done ? "x" : " "}] ${entry.name}\n`;
-		for (const item of entry.items) {
-			bundleString += `\t- [${item.done ? "x" : " "}] ${item.item.name}: ${item.item.amount}\n`;
-		}
-		return bundleString;
-	}
-
-	parseViewData(data: string): Array<BundleEntry> {
-		const lines = data.split("\n");
-
-		let current_entry: BundleEntry | null = null;
-		let entries: Array<BundleEntry> = [];
-		for (const line of lines) {
-			if (line.startsWith("-") || line.startsWith("+")) {
-				// Match the bundle name in the format like "- [ ] Bundle Name" or "+ [x] Bundle Name"
-				const match = line.match(/^(-|\+) \[( |x)\] (.+)$/);
-				if (!match) {
-					console.log(`Invalid line format: ${line}`);
-					continue;
-				}
-
-				let folded = match?.[1] === "+";
-				let done = match?.[2] === "x";
-				let name = match?.[3] || "";
-
-				if (current_entry) {
-					entries.push(current_entry);
-				}
-				current_entry = new BundleEntry([], name, done, folded);
-
-			} else if (line.startsWith("\t-")) {
-				// No + parse, since items cannot be folded
-				const match = line.match(/^\t- \[( |x)\] (.+): (.+)$/);
-				if (!match) {
-					console.log(`Invalid line format: ${line}`);
-					continue;
-				}
-
-				let done = match?.[1] === "x";
-				let name = match?.[2] || "";
-				let amount = match?.[3] || "";
-
-				if (current_entry) {
-					current_entry.items.push(new ItemEntry(new Item(name, amount, null), done));
-				}
-
-			}
-		}
-		if (current_entry) {
-			entries.push(current_entry);
-		}
-
-		console.log(`Parsed ${entries.length} entries`);
-
-		return entries;
-	}
-
-}
-
 
 export default class ShoppingListPlugin extends Plugin {
 	// @ts-ignore
@@ -154,11 +18,11 @@ export default class ShoppingListPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.registerMarkdownCodeBlockProcessor("shoppingItems", ingredientsPostProcessor);
+		this.registerMarkdownCodeBlockProcessor("shopping", ingredientsPostProcessor);
 
 		this.addSettingTab(new ShoppingPluginSettingTab(this.app, this));
 
-		this.registerView('shopping-list', (leaf) => new ShoppingListView(leaf, this));
+		this.registerView('shopping-list', (leaf) => new ShoppingListView(leaf));
 		this.registerExtensions(['list'], SHOPPING_LIST_VIEW_TYPE);
 
 		store.plugin.set(this);
@@ -170,6 +34,9 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 	public async copyToFile(items: Array<Item>) {
+		let dir = this.settings.shoppingListDir;
+		let file = this.settings.defaultShoppingListFileName;
+
 		let currentFile = this.app.workspace.getActiveFile();
 		if (!currentFile) {
 			new Notice("No active file found. Please open a file to copy the item list.");
@@ -181,14 +48,16 @@ export default class ShoppingListPlugin extends Plugin {
 		const innerContent = items.map(item => `\t- [ ] ${item.name}: ${item.amount}`).join("\n");
 		const content = `- [ ] ${projectName}\n` + innerContent;
 
-		let listDir = this.app.vault.getFolderByPath(this.settings.shoppingListDir);
-		if (!listDir) {
-			new Notice(`Directory ${listDir} not found. Please check your settings.`);
-			return;
+
+		if (dir !== '') {
+			let listDir = this.app.vault.getFolderByPath(dir);
+			if (!listDir) {
+				this.app.vault.createFolder(dir);
+			}
 		}
 
 		// TODO: do it ideomatically
-		let fileName = this.settings.shoppingListDir + '/' + this.settings.defaultShoppingListFileName;
+		let fileName = dir === '' ? file : dir + '/' + file;
 
 		try {
 			const existingFile = this.app.vault.getFileByPath(fileName);
@@ -196,6 +65,7 @@ export default class ShoppingListPlugin extends Plugin {
 				let existingContent = await this.app.vault.read(existingFile);
 				existingContent += "\n" + content;
 
+				// We don't check the content of the file, we just append to it. User should know better!
 				await this.app.vault.modify(existingFile, existingContent);
 			} else {
 				// If the file doesn't exist, create it
@@ -204,7 +74,7 @@ export default class ShoppingListPlugin extends Plugin {
 			new Notice(`Item list is copied to ${fileName}`);
 		} catch (error) {
 			console.error("Failed to copy the item list:", error);
-			new Notice("Failed to copy the item list. Check the console for details.");
+			new Notice("Failed to copy the item list");
 		}
 	}
 
