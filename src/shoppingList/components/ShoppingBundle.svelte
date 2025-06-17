@@ -72,24 +72,24 @@
 <style>
 	.shopping-list-item {
 		background: var(--background-secondary);
-		border-radius: 6px;
-		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-		padding-left: 6px;
-		padding-right: 6px;
+		border-radius: var(--radius-m);
+		box-shadow: 0 var(--size-2-1) var(--size-2-2) rgba(0, 0, 0, 0.1);
+		padding-left: var(--size-2-3);
+		padding-right: var(--size-2-3);
 		transition:
 			background-color 0.3s ease,
 			box-shadow 0.3s ease;
-		margin-bottom: 12px;
+		margin-bottom: var(--size-4-3);
 	}
 
 	.shopping-list-item:hover {
 		background: var(--background-modifier-hover);
-		box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+		box-shadow: 0 var(--size-2-1) var(--size-2-3) rgba(0, 0, 0, 0.2);
 	}
 	.item-details {
 		list-style: none;
 		padding: 0;
-		padding-bottom: 6px;
+		padding-bottom: var(--size-2-3);
 		margin: 0px;
 	}
 </style>

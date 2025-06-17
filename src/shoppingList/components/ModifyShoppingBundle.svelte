@@ -62,7 +62,7 @@
 		list-style: none;
 		padding: 0;
 		margin: 0px;
-		padding-bottom: 6px;
+		padding-bottom: var(--size-2-3);
 	}
 
 	.add-button-row {
@@ -76,14 +76,12 @@
 		box-shadow: none;
 		outline: none;
 		color: var(--interactive-accent);
-		font-size: 22px;
 		cursor: pointer;
 		padding: 0;
-		width: 22px;
-		height: 22px;
+		font-size: var(--icon-l);
 		display: flex;
 		transition: color 0.3s ease;
-		margin-left: 8px;
+		margin-left: var(--size-4-2);
 	}
 
 	.add-button:hover {

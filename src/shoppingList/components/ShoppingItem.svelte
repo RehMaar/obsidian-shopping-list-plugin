@@ -27,11 +27,11 @@
 		background: var(--background-primary-alt);
 		align-items: center;
 		transition: background-color 0.3s ease;
-		border-radius: 4px;
-		gap: 8px;
-		padding: 6px 12px;
-		margin: 8px;
-		height: 32px;
+		border-radius: var(--radius-s);
+		gap: var(--size-2-2);
+		padding: var(--size-2-3) var(--size-4-3);
+		margin: var(--size-4-2);
+		height: var(--size-4-8);
 	}
 
 	.item-detail:hover {
@@ -39,12 +39,12 @@
 	}
 
 	.item-name {
-		font-size: 14px;
+		font-size: var(--font-text-size);
 		color: var(--text-normal);
 	}
 
 	.item-amount {
-		font-size: 14px;
+		font-size: var(--font-text-size);
 		color: var(--text-muted);
 		font-style: italic;
 	}

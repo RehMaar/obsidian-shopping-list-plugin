@@ -135,11 +135,9 @@
 		box-shadow: none;
 		outline: none;
 		color: var(--interactive-accent);
-		font-size: 22px;
 		cursor: pointer;
 		padding: 0;
-		width: 22px;
-		height: 22px;
+		font-size: var(--icon-l);
 		display: flex;
 		transition: color 0.3s ease;
 		margin-left: 0px;

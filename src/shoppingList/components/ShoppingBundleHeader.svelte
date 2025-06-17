@@ -13,6 +13,7 @@
 <div class="item-header">
 	<!-- Checkbox for marking the entry as done -->
 	<input
+		class="checkbox"
 		type="checkbox"
 		checked={bundle.done}
 		on:change={() => toggleDone(bundle)}
@@ -42,9 +43,9 @@
 	.item-header {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-size: 16px;
-		font-weight: bold;
+		gap: var(--size-4-2);
+		font-size: var(--font-text-size);
+		font-weight: var(--font-bold);
 		color: var(--text-title);
 	}
 
@@ -54,11 +55,10 @@
 		border: none;
 		flex: 1 1 auto;
 		color: var(--text-title);
-		font-size: 16px;
-		font-weight: bold;
+		font-size: var(--font-text-size);
+		font-weight: var(--font-bold);
 		text-align: left;
 		padding: 0;
-		height: 36px;
 		display: flex;
 		align-items: center;
 	}
@@ -71,12 +71,10 @@
 		box-shadow: none;
 		outline: none;
 		color: var(--interactive-accent);
-		font-size: 22px;
+		font-size: var(--icon-l);
 		cursor: pointer;
 		padding: 0;
 		margin-left: auto;
-		width: 22px;
-		height: 22px;
 		display: flex;
 		align-items: center;
 		justify-content: center;

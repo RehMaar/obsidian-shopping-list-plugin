@@ -1,4 +1,6 @@
 <script lang="ts">
+	import { BrushCleaning } from "lucide-svelte";
+
 	import store from "../../store";
 	import type ShoppingListPlugin from "../../main";
 	import type { BundleEntry, ItemEntry } from "../../types";
@@ -46,9 +48,6 @@
 		onSave(entries);
 	}
 
-	function sortByItemName() {}
-	function sortByBundleName() {}
-
 	// Function to remove a bundle
 	function removeBundle(entry: BundleEntry) {
 		console.log("Removing bundle:", entry);
@@ -62,6 +61,30 @@
 			},
 		).open();
 	}
+
+	function cleanAllDone() {
+		new ConfirmModal(
+			plugin.app,
+			"Are you sure you want to clear all done bundles?",
+			() => {
+				entries = entries.filter((e) => !e.done);
+				refreshPage();
+				onSave(entries);
+			},
+		).open();
+	}
+
+	function cleanAll() {
+		new ConfirmModal(
+			plugin.app,
+			"Are you sure you want to clear all done bundles?",
+			() => {
+				entries = entries.filter((e) => e.done);
+				refreshPage();
+				onSave(entries);
+			},
+		).open();
+	}
 </script>
 
 <div class="shopping-list-container">
@@ -69,20 +92,20 @@
 		<header class="shopping-list-header">
 			<h1>Shopping List</h1>
 			<div class="header-buttons">
-				<button class="sort-button" on:click={sortByItemName}
-					>Sort by Items</button
+				<button
+					class="button"
+					aria-label="Clear all"
+					on:click={cleanAll}
 				>
-				<button class="sort-button" on:click={sortByBundleName}
-					>Sort by Bundles</button
-				>
+					<BrushCleaning />
+				</button>
 			</div>
 		</header>
 
-		{#each entries as bundle, bundle_index}
+		{#each entries as bundle}
 			{#if !bundle.done}
 				<ShoppingBundle
 					{bundle}
-					{bundle_index}
 					onDone={toggleDone}
 					onFold={toggleFold}
 					onRemove={removeBundle}
@@ -97,13 +120,18 @@
 	<div class="shopping-list done-list">
 		<header class="shopping-list-header">
 			<h1>Shopping List Done</h1>
-			<button class="button">Clear</button>
+			<button
+				class="button"
+				aria-label="Clear all"
+				on:click={cleanAllDone}
+			>
+				<BrushCleaning />
+			</button>
 		</header>
-		{#each entries as bundle, bundle_index}
+		{#each entries as bundle}
 			{#if bundle.done}
 				<ShoppingBundle
 					{bundle}
-					{bundle_index}
 					onDone={toggleDone}
 					onFold={toggleFold}
 					onRemove={removeBundle}
@@ -118,11 +146,10 @@
 	/* General Styles */
 	.shopping-list-container {
 		background: var(--background-primary);
-		border-radius: 8px;
-		box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+		border-radius: var(--radius-m);
+		box-shadow: 0 var(--size-2-1) var(--size-2-2) rgba(0, 0, 0, 0.2);
 		width: 100%;
-		max-width: 600px;
-		padding: 16px;
+		padding: var(--size-4-4);
 		margin: 0 auto;
 		color: var(--text-normal);
 	}
@@ -130,36 +157,42 @@
 		display: flex;
 		justify-content: space-between;
 		align-items: center;
-		margin-bottom: 16px;
+		margin-bottom: var(--size-4-4);
 	}
 
 	.shopping-list-header h1 {
-		font-size: 20px;
+		font-size: var(--font-text-size);
 		color: var(--text-title);
 		margin: 0;
 	}
 
 	.header-buttons {
 		display: flex;
-		gap: 8px;
-	}
-
-	.sort-button {
-		background-color: var(--interactive-accent);
-		color: var(--text-on-accent);
-		border: none;
-		border-radius: 6px;
-		padding: 6px 12px;
-		font-size: 14px;
-		cursor: pointer;
-		transition: background-color 0.3s ease;
-	}
-
-	.sort-button:hover {
-		background-color: var(--interactive-accent-hover);
+		gap: var(--size-4-2);
 	}
 
 	.done-list {
-		margin-top: 48px;
+		margin-top: var(--size-4-12);
+	}
+
+	.button {
+		background: none;
+		border: none;
+		padding: 0;
+		margin: 0;
+		box-shadow: none;
+		outline: none;
+		color: var(--interactive-accent);
+		padding: 0;
+		margin-left: auto;
+		font-size: var(--icon-l);
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		transition: color 0.3s ease;
+	}
+
+	.button:hover {
+		color: var(--interactive-accent-hover);
 	}
 </style>

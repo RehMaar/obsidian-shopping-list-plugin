@@ -61,11 +61,10 @@
 		background: var(--background-primary-alt);
 		align-items: center;
 		transition: background-color 0.3s ease;
-		border-radius: 4px;
-		gap: 8px;
-		padding: 6px 12px;
-		margin: 8px;
-		height: 32px;
+		border-radius: var(--radius-s);
+		gap: var(--size-2-2);
+		padding: var(--size-2-3) var(--size-4-3);
+		margin: var(--size-4-2);
 	}
 	.item-detail:hover {
 		background: var(--background-modifier-hover);
@@ -73,8 +72,8 @@
 	.item-entry-input {
 		background: transparent;
 		border: none;
-		font-size: 14px;
-		font-weight: normal;
+		font-size: var(--font-text-size);
+		font-weight: var(--font-normal);
 		color: var(--text-normal);
 		padding: 0;
 		margin: 0;
@@ -98,12 +97,10 @@
 		box-shadow: none;
 		outline: none;
 		color: var(--interactive-accent);
-		font-size: 22px;
 		cursor: pointer;
 		padding: 0;
 		margin-left: auto;
-		width: 22px;
-		height: 22px;
+		font-size: var(--icon-l);
 		display: flex;
 		align-items: center;
 		justify-content: center;

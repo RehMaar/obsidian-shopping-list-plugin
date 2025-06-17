@@ -53,15 +53,15 @@
 	.item-header {
 		display: flex;
 		align-items: center;
-		gap: 8px;
-		font-size: 16px;
-		font-weight: bold;
+		gap: var(--size-4-2);
+		font-size: var(--font-text-size);
+		font-weight: var(--font-bold);
 		color: var(--text-title);
 	}
 	.entry-title {
 		cursor: pointer;
 		flex: 1 1 auto;
-		font-size: 16px;
+		font-size: var(--font-text-size);
 		color: var(--text-title);
 		font-weight: bold;
 		background: transparent;
@@ -71,7 +71,6 @@
 		box-sizing: border-box;
 		outline: none;
 		min-width: 0;
-		height: 36px;
 		display: flex;
 		align-items: center;
 	}
@@ -87,12 +86,10 @@
 		box-shadow: none;
 		outline: none;
 		color: var(--interactive-accent);
-		font-size: 22px;
 		cursor: pointer;
 		padding: 0;
 		margin-left: auto;
-		width: 22px;
-		height: 22px;
+		font-size: var(--icon-l);
 		display: flex;
 		align-items: center;
 		justify-content: center;
