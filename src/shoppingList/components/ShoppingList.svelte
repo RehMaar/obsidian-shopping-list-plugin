@@ -4,6 +4,7 @@
 	import type { BundleEntry, ItemEntry } from "../../types";
 	import ShoppingBundle from "./ShoppingBundle.svelte";
 	import AddShoppingBundle from "./AddShoppingBundle.svelte";
+	import { ConfirmModal } from "../ConfirmModal";
 
 	let plugin: ShoppingListPlugin;
 	store.plugin.subscribe((p) => (plugin = p));
@@ -49,9 +50,16 @@
 
 	// Function to remove a bundle
 	function removeBundle(entry: BundleEntry) {
-		entries = entries.filter((e) => e !== entry); // Remove the bundle from the original entries array
-		refreshPage(); // Refresh the page to reflect changes
-		onSave(entries); // Save the updated entries
+		console.log("Removing bundle:", entry);
+		new ConfirmModal(
+			plugin.app,
+			"Are you sure you want to remove this bundle?",
+			() => {
+				entries = entries.filter((e) => e !== entry);
+				refreshPage();
+				onSave(entries);
+			},
+		).open();
 	}
 </script>
 
@@ -116,8 +124,6 @@
 		margin: 0 auto;
 		color: var(--text-normal);
 	}
-
-	/* Header Styles */
 	.shopping-list-header {
 		display: flex;
 		justify-content: space-between;
@@ -151,14 +157,7 @@
 		background-color: var(--interactive-accent-hover);
 	}
 
-	/* Shopping List Styles */
-	.shopping-list {
-		display: flex;
-		flex-direction: column;
-		gap: 12px;
-	}
-
 	.done-list {
-		margin-top: 48px; /* Large gap before the done list */
+		margin-top: 48px;
 	}
 </style>

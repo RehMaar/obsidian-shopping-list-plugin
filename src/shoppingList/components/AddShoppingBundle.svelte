@@ -13,18 +13,6 @@
 	let currentItemAmount = "";
 	let addingItem = false; // true when entering item name/amount
 
-	let amountInput: HTMLInputElement;
-
-	function openAddBundle() {
-		showAddBundleInput = true;
-	}
-
-	function closeAddBundle() {
-		showAddBundleInput = false;
-		newBundleName = "";
-		newItems = [];
-	}
-
 	function acceptBundleName() {
 		if (newBundleName.trim() === "") return;
 		addingBundle = true;
@@ -39,8 +27,6 @@
 		currentItemName = "";
 		currentItemAmount = "";
 	}
-
-	function focusAmountInput() {}
 
 	function acceptItem() {
 		let itemName = currentItemName.trim();
@@ -87,10 +73,9 @@
 			<SquarePlus />
 		</div>
 	{:else if !addingBundle}
-		<!-- Gray box, like a bundle, but with input for name -->
+		<!-- Input for the bundle name -->
 		<div class="shopping-list-item add-bundle-row">
 			<div class="item-header">
-				<!-- Accept (check) and cancel (cross) buttons on the left -->
 				<input
 					type="checkbox"
 					checked={false}
@@ -108,9 +93,9 @@
 				<button
 					class="accept-button"
 					on:click={acceptBundleName}
-					aria-label="Accept"
+					aria-label="Add Bindle"
 				>
-					<SquareCheck />
+					<SquarePlus />
 				</button>
 				<button
 					class="remove-button"
@@ -132,7 +117,21 @@
 					tabindex="-1"
 					style="pointer-events: none"
 				/>
-				<span class="entry-title">{newBundleName}</span>
+				<!-- We leave here an input box to be able to modify -->
+				<input
+					class="entry-title add-bundle-name"
+					type="text"
+					bind:value={newBundleName}
+					placeholder="Bundle name"
+					on:keydown={(e) => e.key === "Enter" && acceptBundleName()}
+				/>
+				<button
+					class="accept-button"
+					on:click={finalizeBundle}
+					aria-label="Save Bundle"
+				>
+					<SquareCheck />
+				</button>
 				<button
 					class="remove-button"
 					on:click={cancelAddBundle}
@@ -151,12 +150,19 @@
 							tabindex="-1"
 							style="pointer-events: none"
 						/>
-						<span class="item-name">{item.item.name}</span>
-						{#if item.item.amount !== null}
-							<span class="item-amount">
-								{item.item.amount}
-							</span>
-						{/if}
+						<input
+							type="text"
+							class="item-entry-name-input"
+							bind:value={item.item.name}
+							placeholder="Item name"
+						/>
+						<input
+							type="text"
+							class="item-entry-amount-input"
+							bind:value={item.item.amount}
+							placeholder="Amount"
+							on:keydown={(e) => {}}
+						/>
 					</li>
 				{/each}
 				<!-- New item input row -->
@@ -193,18 +199,11 @@
 					{/if}
 				</li>
 			</ul>
-			<button
-				class="add-bundle-confirm"
-				on:click={finalizeBundle}
-				style="margin-top:12px;"
-			>
-				Save Bundle
-			</button>
 		</div>
 	{/if}
 </div>
 
-<style>
+<!-- <style>
 	/* Container for the add bundle area */
 	.shopping-list-add-bundle {
 		margin-top: 16px;
@@ -254,7 +253,8 @@
 		background: var(--background-modifier-hover);
 	}
 
-	.item-detail {
+	.item-detail,
+	.add-item-entry-row {
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -264,21 +264,18 @@
 		margin-bottom: 6px;
 		box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 		transition: background-color 0.3s ease;
+		min-height: 36px; /* Ensures consistent height */
+		padding-top: 0;
+		padding-bottom: 0;
+		height: 24px;
+		box-sizing: border-box;
 	}
 
-	.item-detail:hover {
-		background: var(--background-modifier-hover);
-	}
-
-	.item-name {
-		font-size: 14px;
-		color: var(--text-normal);
-	}
-
-	.item-amount {
-		font-size: 14px;
-		color: var(--text-muted);
-		font-weight: bold;
+	/* Remove default ul/li spacing */
+	.item-details {
+		padding-left: 0;
+		margin-left: 0;
+		list-style: none;
 	}
 
 	/* Header row for bundle name input or display */
@@ -397,7 +394,7 @@
 		color: var(--text-muted);
 		padding: 0;
 		margin: 0;
-		width: 60px;
+		width: 100px;
 		box-sizing: border-box;
 		outline: none;
 	}
@@ -407,28 +404,6 @@
 		border: none;
 		outline: none;
 		box-shadow: none;
-	}
-
-	/* Save bundle button */
-	.add-bundle-confirm {
-		width: 100%;
-		padding: 10px 0;
-		font-size: 16px;
-		background: var(--interactive-accent);
-		color: var(--text-on-accent);
-		border: none;
-		border-radius: 6px;
-		cursor: pointer;
-		margin-top: 8px;
-		transition: background 0.2s;
-	}
-
-	.add-bundle-confirm:hover {
-		background: var(--interactive-accent-hover);
-	}
-	.item-details {
-		padding-left: 0;
-		margin-left: 0;
 	}
 
 	/* Responsive for mobile */
@@ -441,8 +416,5 @@
 		.item-entry-amount-input {
 			font-size: 15px;
 		}
-		.add-bundle-confirm {
-			font-size: 15px;
-		}
 	}
-</style>
+</style> -->

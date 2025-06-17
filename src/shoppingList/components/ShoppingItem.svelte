@@ -12,24 +12,24 @@
 	}
 </script>
 
-<li class="item-detail">
+<ul class="item-detail">
 	<input
 		type="checkbox"
 		id={`${parent_index}-${entry.item.name}-${entry_index}`}
 		checked={entry.done}
 		on:change={() => toggleDone(entry)}
 	/>
-	<label
+	<!-- <label
 		for={`${parent_index}-${entry.item.name}-${entry_index}`}
 		class:done={entry.done}
-	>
-		<span class="item-name">{entry.item.name}</span>
-		<span class="item-amount">{entry.item.amount}</span>
-	</label>
-</li>
+	> -->
+	<span class="item-name">{entry.item.name}</span>
+	<span class="item-amount">{entry.item.amount}</span>
+	<!-- </label> -->
+</ul>
 
 <style>
-	.item-detail {
+	/* .item-detail {
 		display: flex;
 		align-items: center;
 		gap: 8px;
@@ -54,5 +54,5 @@
 		font-size: 14px;
 		color: var(--text-muted);
 		font-weight: bold;
-	}
+	} */
 </style>
