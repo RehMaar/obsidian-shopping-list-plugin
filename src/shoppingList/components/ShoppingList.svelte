@@ -2,9 +2,10 @@
 	import store from "../../store";
 	import type ShoppingListPlugin from "../../main";
 	import type { BundleEntry, ItemEntry } from "../../types";
+	import { ConfirmModal } from "../ConfirmModal";
+
 	import ShoppingBundle from "./ShoppingBundle.svelte";
 	import AddShoppingBundle from "./AddShoppingBundle.svelte";
-	import { ConfirmModal } from "../ConfirmModal";
 
 	let plugin: ShoppingListPlugin;
 	store.plugin.subscribe((p) => (plugin = p));
@@ -64,19 +65,19 @@
 </script>
 
 <div class="shopping-list-container">
-	<header class="shopping-list-header">
-		<h1>Shopping List</h1>
-		<div class="header-buttons">
-			<button class="sort-button" on:click={sortByItemName}
-				>Sort by Items</button
-			>
-			<button class="sort-button" on:click={sortByBundleName}
-				>Sort by Bundles</button
-			>
-		</div>
-	</header>
-
 	<div class="shopping-list">
+		<header class="shopping-list-header">
+			<h1>Shopping List</h1>
+			<div class="header-buttons">
+				<button class="sort-button" on:click={sortByItemName}
+					>Sort by Items</button
+				>
+				<button class="sort-button" on:click={sortByBundleName}
+					>Sort by Bundles</button
+				>
+			</div>
+		</header>
+
 		{#each entries as bundle, bundle_index}
 			{#if !bundle.done}
 				<ShoppingBundle
@@ -89,13 +90,14 @@
 				/>
 			{/if}
 		{/each}
-	</div>
 
-	<AddShoppingBundle onFinish={addBundle} />
+		<AddShoppingBundle onFinish={addBundle} />
+	</div>
 
 	<div class="shopping-list done-list">
 		<header class="shopping-list-header">
 			<h1>Shopping List Done</h1>
+			<button class="button">Clear</button>
 		</header>
 		{#each entries as bundle, bundle_index}
 			{#if bundle.done}

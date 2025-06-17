@@ -1,14 +1,17 @@
 <script lang="ts">
-	import { BundleEntry, Item, ItemEntry } from "../../types";
-	import {
-		SquareCheck,
-		SquareMinus,
-		SquarePen,
-		SquareX,
-	} from "lucide-svelte";
+	import { SquarePlus } from "lucide-svelte";
+
+	import { BundleEntry, ItemEntry, Item } from "../../types";
+
+	import ModifyShoppingItem from "./ModifyShoppingItem.svelte";
+	import ModifyShoppingBundleHeader from "./ModifyShoppingBundleHeader.svelte";
+	import AddShoppingItem from "./AddShoppingItem.svelte";
 
 	export let bundle: BundleEntry;
 	export let onSave: (bundle: BundleEntry) => void;
+	export let onRemove: (bundle: BundleEntry) => void;
+
+	let addingNewItem = false;
 
 	function saveBundle() {
 		if (bundle.name.trim() === "") return;
@@ -22,71 +25,35 @@
 	function removeItem(item: ItemEntry) {
 		bundle.items = bundle.items.filter((i) => i !== item);
 	}
+
+	function acceptItem(item: Item) {
+		bundle.items = [...bundle.items, new ItemEntry(item)];
+	}
 </script>
 
 <div class="shopping-list-item modify-bundle-row">
-	<div class="item-header">
-		<input
-			type="checkbox"
-			checked={false}
-			disabled
-			tabindex="-1"
-			style="pointer-events: none"
-		/>
-		<div class="entry-title-container">
-			<input
-				class="entry-title"
-				type="text"
-				bind:value={bundle.name}
-				placeholder="Bundle name"
-			/>
-		</div>
-		<button
-			class="accept-button"
-			on:click={saveBundle}
-			aria-label="Save Bundle"
-		>
-			<SquarePen />
-		</button>
-		<button
-			class="accept-button"
-			on:click={saveBundle}
-			aria-label="Save Bundle"
-		>
-			<SquareX />
-		</button>
-	</div>
+	<ModifyShoppingBundleHeader {bundle} onSave={saveBundle} {onRemove} />
+
 	<ul class="item-details">
 		{#each bundle.items as item}
-			<ul class="item-detail">
-				<input
-					type="checkbox"
-					checked={false}
-					disabled
-					tabindex="-1"
-					style="pointer-events: none"
-				/>
-				<input
-					type="text"
-					class="item-entry-name-input"
-					bind:value={item.item.name}
-					placeholder="Item name"
-				/>
-				<input
-					type="text"
-					class="item-entry-amount-input"
-					bind:value={item.item.amount}
-					placeholder="Amount"
-				/>
-				<button
-					class="remove-button"
-					on:click={() => removeItem(item)}
-					aria-label="Remove Item"
-				>
-					<SquareMinus />
-				</button>
-			</ul>
+			<ModifyShoppingItem {item} {removeItem} />
 		{/each}
+
+		{#if !addingNewItem}
+			<div class="add-button-row">
+				<button
+					class="add-button"
+					on:click={() => {
+						addingNewItem = true;
+					}}
+					aria-label="Add item"
+				>
+					<SquarePlus />
+				</button>
+			</div>
+		{:else}
+			<AddShoppingItem {acceptItem} />
+		{/if}
 	</ul>
 </div>
 
@@ -95,48 +62,13 @@
 		list-style: none;
 		padding: 0;
 		margin: 0px;
+		padding-bottom: 6px;
 	}
-	.item-header {
-		display: flex;
-		align-items: center;
-		gap: 8px;
-		font-size: 16px;
-		font-weight: bold;
-		color: var(--text-title);
-	}
-	.entry-title-container {
-		cursor: pointer;
-		transition: background 0.2s;
-		flex: 1 1 auto;
-		color: var(--text-title);
-		font-size: 16px;
-		font-weight: bold;
+
+	.add-button-row {
 		text-align: left;
-		padding: 0;
 	}
-	.entry-title {
-		cursor: pointer;
-		flex: 1 1 auto;
-		font-size: 16px;
-		color: var(--text-title);
-		font-weight: bold;
-		background: transparent;
-		border: none;
-		padding: 0;
-		margin: 0;
-		box-sizing: border-box;
-		outline: none;
-		min-width: 0;
-		height: 36px;
-		display: flex;
-		align-items: center;
-	}
-	.entry-title:focus {
-		outline: none;
-		box-shadow: none;
-	}
-	.accept-button,
-	.remove-button {
+	.add-button {
 		background: none;
 		border: none;
 		padding: 0;
@@ -147,69 +79,14 @@
 		font-size: 22px;
 		cursor: pointer;
 		padding: 0;
-		margin-left: auto;
 		width: 22px;
 		height: 22px;
 		display: flex;
-		align-items: center;
-		justify-content: center;
 		transition: color 0.3s ease;
+		margin-left: 8px;
 	}
 
-	.accept-button:hover,
-	.remove-button:hover {
+	.add-button:hover {
 		color: var(--interactive-accent-hover);
 	}
-	/*
-	.item-header .accept-button,
-	.item-header .remove-button {
-		margin-left: 0;
-	}
-
-	.item-details {
-		padding-left: 0;
-		margin-left: 0;
-		list-style: none;
-	}
-
-	.item-entry-name-input {
-		background: transparent;
-		border: none;
-		font-size: 16px;
-		font-weight: normal;
-		color: var(--text-normal);
-		padding: 0;
-		margin: 0;
-		min-width: 0;
-		box-sizing: border-box;
-		outline: none;
-		flex: 1 1 0;
-	}
-
-	.item-entry-name-input:focus {
-		background: transparent;
-		border: none;
-		outline: none;
-		box-shadow: none;
-	}
-
-	.item-entry-amount-input {
-		background: transparent;
-		border: none;
-		font-size: 16px;
-		color: var(--text-muted);
-		padding: 0;
-		margin: 0;
-		width: 100px;
-		box-sizing: border-box;
-		outline: none;
-	}
-
-	.item-entry-amount-input:focus {
-		background: transparent;
-		border: none;
-		outline: none;
-		box-shadow: none;
-	}
-*/
 </style>
