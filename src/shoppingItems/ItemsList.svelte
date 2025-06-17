@@ -25,7 +25,7 @@
 			on:click={copyToFile}
 			aria-label="Copy to shopping list"
 		>
-			<ClipboardPlus /> Copy
+			<ClipboardPlus /> Copy to list
 		</button>
 	</header>
 
