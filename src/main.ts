@@ -2,8 +2,7 @@ import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Set
 import { MarkdownRenderChild } from "obsidian";
 
 import { type ShoppingPluginSettings, DEFAULT_SETTINGS } from './settings';
-import { ReceipeView, VIEW_TYPE_RECEIPE } from './receipe_view';
-import { ingredientsPostProcessor } from './postprocessor';
+import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
 
 import store from "./store";
 import type { Item } from './types';
@@ -18,10 +17,10 @@ export default class ShoppingListPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		this.registerMarkdownCodeBlockProcessor("ingredients", ingredientsPostProcessor);
+		this.registerMarkdownCodeBlockProcessor("shoppingItems", ingredientsPostProcessor);
 
 		this.addSettingTab(new ShoppingPluginSettingTab(this.app, this));
-	
+
 		store.plugin.set(this);
 	}
 
@@ -29,46 +28,44 @@ export default class ShoppingListPlugin extends Plugin {
 
 	}
 
-  public async copyToFile (items: Array<Item>) {
-	let currentFile = this.app.workspace.getActiveFile();
-	if (!currentFile) {
-		new Notice("No active file found. Please open a file to copy the item list.");
-		return;
+	public async copyToFile(items: Array<Item>) {
+		let currentFile = this.app.workspace.getActiveFile();
+		if (!currentFile) {
+			new Notice("No active file found. Please open a file to copy the item list.");
+			return;
+		}
+		let projectName = currentFile.basename;
+
+
+		const innerContent = items.map(item => `\t- [ ] ${item.name}: ${item.amount}`).join("\n");
+		const content = `- [ ] ${projectName}\n` + innerContent;
+
+		let listDir = this.app.vault.getFolderByPath(this.settings.shoppingListDir);
+		if (!listDir) {
+			new Notice(`Directory ${listDir} not found. Please check your settings.`);
+			return;
+		}
+
+		// TODO: do it ideomatically
+		let fileName = this.settings.shoppingListDir + '/' + this.settings.defaultShoppingListFileName;
+
+		try {
+			const existingFile = this.app.vault.getFileByPath(fileName);
+			if (existingFile) {
+				let existingContent = await this.app.vault.read(existingFile);
+				existingContent += "\n" + content;
+
+				await this.app.vault.modify(existingFile, existingContent);
+			} else {
+				// If the file doesn't exist, create it
+				await this.app.vault.create(fileName, content);
+			}
+			new Notice(`Item list is copied to ${fileName}`);
+		} catch (error) {
+			console.error("Failed to copy the item list:", error);
+			new Notice("Failed to copy the item list. Check the console for details.");
+		}
 	}
-	let projectName = currentFile.basename;
-
-
-    const innerContent = items.map(item => `\t- [ ] ${item.name}: ${item.amount}`).join("\n");
-	const content = `- [ ] ${projectName}\n` + innerContent;
-
-	let listDir = this.app.vault.getFolderByPath(this.settings.shoppingListDir);
-	if (!listDir) {
-		new Notice(`Directory ${listDir} not found. Please check your settings.`);
-		return;
-	}
-
-	// TODO: do it ideomatically
-	let fileName = this.settings.shoppingListDir + '/' + this.settings.defaultShoppingListFileName;
-
-    try {
-      const existingFile = this.app.vault.getFileByPath(fileName);
-      if (existingFile) {
-        // If the file exists, overwrite it
-		let existingContent = await this.app.vault.read(existingFile);
-		console.log("Existing content: ", existingContent);
-		existingContent += "\n" + content;
-		console.log("New content: ", existingContent);
-        await this.app.vault.modify(existingFile, existingContent);
-      } else {
-        // If the file doesn't exist, create it
-        await this.app.vault.create(fileName, content);
-      }
-      new Notice(`Item list is copied to ${fileName}`);
-    } catch (error) {
-      console.error("Failed to copy the item list:", error);
-      new Notice("Failed to copy the item list. Check the console for details.");
-    }
-  }
 
 	async loadSettings() {
 		this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());

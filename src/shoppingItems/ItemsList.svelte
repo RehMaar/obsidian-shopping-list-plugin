@@ -1,7 +1,7 @@
 <script lang="ts">
-  import store from "./store";
-  import type ShoppingListPlugin from "./main";
-  import { type Item } from "./types";
+  import store from "../store";
+  import type ShoppingListPlugin from "../main";
+  import { type Item } from "../types";
 
   export let items: Array<Item>;
   let plugin: ShoppingListPlugin;
