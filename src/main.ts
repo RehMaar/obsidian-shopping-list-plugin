@@ -6,7 +6,7 @@ import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
 import store from "./store";
 import { Item } from './types';
 
-import { ShoppingListView, SHOPPING_LIST_VIEW_TYPE } from './view';
+import { ShoppingListView, SHOPPING_LIST_VIEW_TYPE } from './shoppingList/view';
 
 export default class ShoppingListPlugin extends Plugin {
 	// @ts-ignore
@@ -27,7 +27,7 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 
-	public async copyToFile(items: Array<Item>) {
+	public async copyToFile(items: Item[]) {
 		let dir = this.settings.shoppingListDir;
 		let file = this.settings.defaultShoppingListFileName;
 

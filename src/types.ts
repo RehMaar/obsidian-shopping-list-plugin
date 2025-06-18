@@ -25,12 +25,12 @@ export class ItemEntry {
 }
 
 export class BundleEntry {
-    items: Array<ItemEntry>;
+    items: ItemEntry[];
     name: string;
     done: boolean;
     folded: boolean;
 
-    constructor(items: Array<ItemEntry>, name: string, done: boolean = false, folded: boolean = false) {
+    constructor(items: ItemEntry[], name: string, done: boolean = false, folded: boolean = false) {
         this.items = items;
         this.name = name;
         this.done = done;
