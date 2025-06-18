@@ -1,4 +1,4 @@
-import { App, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Notice, Plugin, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 
 import { type ShoppingPluginSettings, DEFAULT_SETTINGS } from './settings';
 import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
@@ -6,9 +6,7 @@ import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
 import store from "./store";
 import { Item } from './types';
 
-import { ShoppingListView } from './view';
-
-const SHOPPING_LIST_VIEW_TYPE = 'shopping-list';
+import { ShoppingListView, SHOPPING_LIST_VIEW_TYPE } from './view';
 
 export default class ShoppingListPlugin extends Plugin {
 	// @ts-ignore
@@ -22,16 +20,12 @@ export default class ShoppingListPlugin extends Plugin {
 
 		this.addSettingTab(new ShoppingPluginSettingTab(this.app, this));
 
-		this.registerView('shopping-list', (leaf) => new ShoppingListView(leaf));
+		this.registerView(SHOPPING_LIST_VIEW_TYPE, (leaf) => new ShoppingListView(leaf));
 		this.registerExtensions(['list'], SHOPPING_LIST_VIEW_TYPE);
 
 		store.plugin.set(this);
 	}
 
-
-	onunload() {
-
-	}
 
 	public async copyToFile(items: Array<Item>) {
 		let dir = this.settings.shoppingListDir;
@@ -57,16 +51,15 @@ export default class ShoppingListPlugin extends Plugin {
 		}
 
 		// TODO: do it ideomatically
-		let fileName = dir === '' ? file : dir + '/' + file;
+		let fileName = normalizePath(dir === '' ? file : dir + '/' + file + '.list');
 
 		try {
 			const existingFile = this.app.vault.getFileByPath(fileName);
 			if (existingFile) {
-				let existingContent = await this.app.vault.read(existingFile);
-				existingContent += "\n" + content;
-
 				// We don't check the content of the file, we just append to it. User should know better!
-				await this.app.vault.modify(existingFile, existingContent);
+				await this.app.vault.process(existingFile, (data: string) => {
+					return data + "\n" + content;
+				})
 			} else {
 				// If the file doesn't exist, create it
 				await this.app.vault.create(fileName, content);
@@ -83,8 +76,6 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 	async updateSettings() {
-		console.log('Updating settings');
-		console.log(this.settings);
 		await this.saveData(this.settings);
 	}
 
@@ -104,8 +95,8 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Shopping List Directory')
-			.setDesc('In this directory we will store the shopping lists')
+			.setName('Shopping list directory')
+			.setDesc("We'll store the list there. If nothing is specified, the list will be stored in the root of your vault.")
 			.addText(text => text
 				.setPlaceholder('Enter the path')
 				.setValue(this.plugin.settings.shoppingListDir)
@@ -115,8 +106,8 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 				}));
 
 		new Setting(containerEl)
-			.setName('Current Shopping List file name')
-			.setDesc('This is the shopping lists main file')
+			.setName('Current shopping list file name')
+			.setDesc(`Set the filename for your shopping list. Keep it without a file extension, '.list' will be automatically added.`)
 			.addText(text => text
 				.setPlaceholder('Enter the name')
 				.setValue(this.plugin.settings.defaultShoppingListFileName)

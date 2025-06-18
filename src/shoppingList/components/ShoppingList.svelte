@@ -38,9 +38,7 @@
 	}
 
 	function toggleDone(entry: BundleEntry) {
-		console.log("Toggling done for entry:", entry);
 		entry.toggleDone();
-		console.log("Toggling done for entry:", entry);
 
 		refreshPage(); // Refresh the page to reflect changes
 		onSave(entries);

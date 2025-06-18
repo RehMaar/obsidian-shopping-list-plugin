@@ -2,8 +2,8 @@
 	"id": "shopping-list-plugin",
 	"name": "Shopping List Plugin",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
-	"description": "Shopping list tracker for Reciepies",
+	"minAppVersion": "0.18.0",
+	"description": "Shopping list plugin for Obsidian",
 	"author": "RehMaar",
 	"isDesktopOnly": false
 }

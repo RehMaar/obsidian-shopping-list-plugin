@@ -79,7 +79,9 @@
 		gap: var(--size-2-2);
 		padding: var(--size-2-3) var(--size-4-3);
 		margin: var(--size-4-2);
-		height: var(--size-4-8);
+		min-height: var(--size-4-8);
+		height: auto;
+		flex-wrap: wrap;
 	}
 
 	.item-detail:hover {
@@ -89,11 +91,14 @@
 	.item-name {
 		font-size: var(--font-text-size);
 		color: var(--text-normal);
+		overflow-wrap: break-word;
+		max-width: 60%;
 	}
 
 	.item-amount {
 		font-size: var(--font-text-size);
 		color: var(--text-muted);
 		font-style: italic;
+		overflow-wrap: break-word;
 	}
 </style>

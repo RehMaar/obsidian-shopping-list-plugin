@@ -6,7 +6,8 @@ import { Item, BundleEntry, ItemEntry } from './types';
 
 import ShoppingList from './shoppingList/components/ShoppingList.svelte';
 
-// TODO: implement proper saving
+export const SHOPPING_LIST_VIEW_TYPE = 'shopping-list';
+
 export class ShoppingListView extends TextFileView {
     shoppingComponent!: ShoppingList;
     entries: Array<BundleEntry> = [];
@@ -15,54 +16,41 @@ export class ShoppingListView extends TextFileView {
         super(leaf);
     }
 
-    async save(clear?: boolean): Promise<void> {
-        console.log("save called");
-
-
-        let file = this.app.workspace.getActiveFile();
-        if (file) {
-            await this.app.vault.modify(file, this.data);
-        } else {
-            console.log("No active file to save to!");
-        }
-    }
-
     getViewType() {
-        return 'shopping-list';
+        return SHOPPING_LIST_VIEW_TYPE;
     }
 
     getDisplayText() {
-        return 'Shopping List';
+        return 'Shopping List View';
     }
 
     getViewData(): string {
-        console.log(`getViewData ${this.data}`);
-        return this.data;
+        return this.bundlesToString();
     }
 
     setViewData(data: string, clear: boolean): void {
-        console.log("setViewData");
-        console.log(`clear: ${clear} data: ${data}`);
-
         const entries = this.parseViewData(data);
         this.entries = entries;
-        this.shoppingComponent.$set({ entries: entries });
+
+        this.data = this.bundlesToString();
+
+        if (!clear) {
+            this.shoppingComponent.$set({ entries: entries });
+        }
     }
 
     clear() { }
 
     async onLoadFile(file: TFile): Promise<void> {
-        console.log(`onLoadFile ${file.path}`);
-        this.data = await this.app.vault.read(file);
-        console.log(`loaded ${this.data}`);
-        let entries = this.parseViewData(this.data);
+        // the most important line for saving to work! omg
+        await super.onLoadFile(file);
         this.shoppingComponent = new ShoppingList({
             target: this.contentEl,
             props: {
-                entries: entries,
+                entries: this.entries,
                 onSave: (entries: BundleEntry[]) => {
-                    this.data = entries.map((entry) => this.bundleToString(entry)).join("\n");
-                    this.save();
+                    this.entries = entries;
+                    this.requestSave();
                 },
             }
         });
@@ -70,9 +58,14 @@ export class ShoppingListView extends TextFileView {
     }
 
     async onUnloadFile(file: TFile): Promise<void> {
-        console.log(`onUnloadFile ${file.path}`);
-        this.shoppingComponent.$destroy();
+        await super.onUnloadFile(file);
+
         this.data = "";
+        this.shoppingComponent.$destroy();
+    }
+
+    bundlesToString(): string {
+        return this.entries.map((entry) => this.bundleToString(entry)).join("\n");
     }
 
     bundleToString(entry: BundleEntry): string {
@@ -128,8 +121,6 @@ export class ShoppingListView extends TextFileView {
         if (current_entry) {
             entries.push(current_entry);
         }
-
-        console.log(`Parsed ${entries.length} entries`);
 
         return entries;
     }
