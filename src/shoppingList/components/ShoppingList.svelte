@@ -3,7 +3,7 @@
 
 	import store from "../../store";
 	import type ShoppingListPlugin from "../../main";
-	import type { BundleEntry, ItemEntry } from "../../types";
+	import type { BundleEntry, ItemEntry, Error } from "../../types";
 	import { ConfirmModal } from "../ConfirmModal";
 
 	import ShoppingBundle from "./ShoppingBundle.svelte";
@@ -12,8 +12,9 @@
 	let plugin: ShoppingListPlugin;
 	store.plugin.subscribe((p) => (plugin = p));
 
-	export let entries: Array<BundleEntry>;
-	export let onSave: (entries: Array<BundleEntry>) => void;
+	export let error: Error | null;
+	export let entries: BundleEntry[];
+	export let onSave: (entries: BundleEntry[]) => void;
 
 	let isDoneFolded: boolean = true;
 
@@ -101,6 +102,17 @@
 				</button>
 			</div>
 		</header>
+
+		{#if error != null}
+			<div class="error-message-box">
+				{error.message}
+				<br />
+				<br />
+				Probably, the file was changed outside. This issue will be fixed
+				automatically when you close this file, however some changes may
+				be lost.
+			</div>
+		{/if}
 
 		{#each entries as bundle}
 			{#if !bundle.done}
@@ -215,5 +227,16 @@
 	.done-count {
 		font-style: italic;
 		color: var(--text-muted);
+	}
+
+	.error-message-box {
+		background: var(--background-primary-alt);
+		border-radius: var(--radius-m);
+		box-shadow: 0 var(--size-2-1) var(--size-2-2) rgba(0, 0, 0, 0.2);
+		width: 100%;
+		padding: var(--size-4-4);
+		margin: 0 auto;
+		color: var(--text-error);
+		margin-bottom: var(--size-4-4);
 	}
 </style>

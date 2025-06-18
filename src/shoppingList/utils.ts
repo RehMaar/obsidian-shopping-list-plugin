@@ -1,4 +1,4 @@
-import { Item, ItemEntry, BundleEntry } from "../types";
+import { Item, ItemEntry, BundleEntry, type Result, ok, err } from "../types";
 
 export function bundleToString(entry: BundleEntry): string {
     let foldedMark = entry.folded ? "+" : "-";
@@ -9,21 +9,21 @@ export function bundleToString(entry: BundleEntry): string {
     return bundleString;
 }
 
-export function parseViewData(data: string): BundleEntry[] {
+// TODO: do it more percise
+export function parseViewData(data: string): Result<BundleEntry[]> {
     const lines = data.split("\n");
 
     let current_entry: BundleEntry | null = null;
     let entries: BundleEntry[] = [];
-    console.log('aaaaaaa');
-    for (const line of lines) {
+    for (let idx = 0; idx < lines.length; idx++) {
+        let line = lines[idx];
         if (line.startsWith("-") || line.startsWith("+")) {
             console.log(`Processing line: ${line}`);
             // Match the bundle name in the format like "- [ ] Bundle Name" or "+ [x] Bundle Name"
             const match = line.match(/^(-|\+) \[( |x)\] (.+)$/);
             if (!match) {
                 // TODO: error handling
-                console.log(`Invalid line format: ${line}`);
-                continue;
+                return err(`Invalid line format for a bundle header at line ${idx + 1}: ${line}`);
             }
 
             let folded = match?.[1] === "+";
@@ -33,18 +33,14 @@ export function parseViewData(data: string): BundleEntry[] {
             if (current_entry) {
                 entries.push(current_entry);
             }
-            console.log(`Found bndle ${name}`);
             current_entry = new BundleEntry([], name, done, folded);
 
         } else if (line.trim().startsWith("-")) {
-            console.log(`Processing item line: ${line}`);
             // No + parse, since items cannot be folded
             const match = line.match(/^(\t|\s+)- \[( |x)\] (.+)$/);
             if (!match) {
-                console.log(`Invalid line format: ${line}`);
-                continue;
+                return err(`Invalid item format at line ${idx + 1}: ${line}`);
             }
-            console.log(`Match found: ${match}`);
             let item_format = match[3].trim().split(':');
 
             let done = match?.[2] === "x";
@@ -55,13 +51,12 @@ export function parseViewData(data: string): BundleEntry[] {
                 current_entry.items.push(new ItemEntry(new Item(name, amount, null), done));
             }
 
-        } else {
-            console.log(`Ignoring line: ${line}`);
         }
     }
+
     if (current_entry) {
         entries.push(current_entry);
     }
 
-    return entries;
+    return ok(entries);
 }

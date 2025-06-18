@@ -2,7 +2,7 @@ import { WorkspaceLeaf } from 'obsidian';
 import { TFile } from "obsidian";
 import { TextFileView } from 'obsidian';
 
-import { BundleEntry } from '../types';
+import { BundleEntry, ok } from '../types';
 import { bundleToString, parseViewData } from './utils';
 
 import ShoppingList from './components/ShoppingList.svelte';
@@ -31,12 +31,19 @@ export class ShoppingListView extends TextFileView {
 
     setViewData(data: string, clear: boolean): void {
         const entries = parseViewData(data);
-        this.entries = entries;
+        if (entries.success) {
+            this.entries = entries.value;
+        }
 
         this.data = this.bundlesToString();
 
         if (!clear) {
-            this.shoppingComponent.$set({ entries: entries });
+            if (entries.success) {
+                this.shoppingComponent.$set({ entries: entries.value });
+                this.shoppingComponent.$set({ error: null });
+            } else {
+                this.shoppingComponent.$set({ error: entries.error });
+            }
         }
     }
 
@@ -48,6 +55,7 @@ export class ShoppingListView extends TextFileView {
         this.shoppingComponent = new ShoppingList({
             target: this.contentEl,
             props: {
+                error: null,
                 entries: this.entries,
                 onSave: (entries: BundleEntry[]) => {
                     this.entries = entries;

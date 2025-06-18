@@ -1,11 +1,12 @@
 <script lang="ts">
 	import { ClipboardPlus } from "lucide-svelte";
+	import { Notice } from "obsidian";
 
 	import store from "../store";
 	import type ShoppingListPlugin from "../main";
-	import { type Item } from "../types";
+	import { type Item, type Result, type Error } from "../types";
 
-	export let items: Array<Item>;
+	export let items: Result<Item[]>;
 	let plugin: ShoppingListPlugin;
 	store.plugin.subscribe((p) => (plugin = p));
 
@@ -14,7 +15,11 @@
 			console.error("Plugin is not initialized.");
 			return;
 		}
-		plugin.copyToFile(items);
+		if (items.success) {
+			plugin.copyToFile(items.value);
+		} else {
+			new Notice("Unable to copy due to formatting errors.");
+		}
 	}
 </script>
 
@@ -30,16 +35,29 @@
 	</header>
 
 	<div class="item-details">
-		{#each items as item}
-			<ul class="item-detail">
-				<span class="item-name">{item.name}</span>
-				<span class="item-amount">{item.amount}</span>
-			</ul>
-		{/each}
+		{#if !items.success}
+			<span class="error-message">{items.error.message}</span>
+		{:else}
+			{#each items.value as item}
+				<ul class="item-detail">
+					<span class="item-name">{item.name}</span>
+					{#if item.amount != null}
+						<span class="item-amount">{item.amount}</span>
+					{/if}
+				</ul>
+			{/each}
+		{/if}
 	</div>
 </div>
 
 <style>
+	.error-message {
+		color: var(--text-error);
+		font-size: var(--font-text-size);
+		padding: var(--size-2-3);
+		text-align: center;
+	}
+
 	.button {
 		background: none;
 		border: none;
@@ -63,8 +81,10 @@
 
 	.list-container {
 		background: var(--background-secondary);
-		border-radius: var(--radius-m);
+		border-radius: var(--radius-l);
 		box-shadow: 0 var(--size-2-1) var(--size-2-2) rgba(0, 0, 0, 0.1);
+		padding-left: var(--size-2-3);
+		padding-right: var(--size-2-3);
 		transition:
 			background-color 0.3s ease,
 			box-shadow 0.3s ease;

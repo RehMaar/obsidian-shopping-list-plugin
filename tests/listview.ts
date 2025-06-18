@@ -1,6 +1,6 @@
 import { describe, expect, test } from '@jest/globals';
 
-import { Item, ItemEntry, BundleEntry } from '../src/types';
+import { Item, ItemEntry, BundleEntry, ok } from '../src/types';
 import { parseViewData } from '../src/shoppingList/utils';
 
 describe('parsing postprocessor list', () => {
@@ -14,7 +14,7 @@ describe('parsing postprocessor list', () => {
 + [x] Bundle2
     - [ ] item1
         `;
-        let expected = [
+        let expected = ok([
             new BundleEntry([
                 new ItemEntry(new Item('item1', '1 liter'), false),
                 new ItemEntry(new Item('item2', '2 kg'), true),
@@ -24,7 +24,7 @@ describe('parsing postprocessor list', () => {
             new BundleEntry([
                 new ItemEntry(new Item('item1'), false)
             ], 'Bundle2', true, true)
-        ];
+        ]);
 
         let bundles = parseViewData(data);
         expect(bundles).toEqual(expected);
@@ -35,11 +35,11 @@ describe('parsing postprocessor list', () => {
 - [ ] Bundle1
     - [ ] item1: 1 liter
     `;
-        let expected = [
+        let expected = ok([
             new BundleEntry([
                 new ItemEntry(new Item('item1', '1 liter'), false),
             ], 'Bundle1', false, false),
-        ];
+        ]);
 
         let bundles = parseViewData(data);
         expect(bundles).toEqual(expected);
