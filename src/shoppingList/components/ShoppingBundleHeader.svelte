@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { SquarePen, SquareX, SquareCheck } from "lucide-svelte";
+	import { SquarePen } from "lucide-svelte";
 
 	import type { BundleEntry } from "../../types";
 
@@ -33,7 +33,7 @@
 	<button
 		class="button"
 		on:click={() => onModify(bundle)}
-		aria-label="Rename"
+		aria-label="Modify"
 	>
 		<SquarePen />
 	</button>

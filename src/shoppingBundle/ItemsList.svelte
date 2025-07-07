@@ -30,7 +30,7 @@
 			on:click={copyToFile}
 			aria-label="Copy to shopping list"
 		>
-			<ClipboardPlus /> Copy to list
+			<ClipboardPlus />
 		</button>
 	</header>
 
@@ -51,6 +51,13 @@
 </div>
 
 <style>
+	.list-header {
+		display: flex;
+		gap: var(--size-4-2);
+		font-size: var(--font-text-size);
+		font-weight: var(--font-bold);
+	}
+
 	.error-message {
 		color: var(--text-error);
 		font-size: var(--font-text-size);
@@ -67,7 +74,6 @@
 		outline: none;
 		color: var(--interactive-accent);
 		cursor: pointer;
-		margin-right: auto;
 		font-size: var(--icon-l);
 		display: flex;
 		align-items: center;

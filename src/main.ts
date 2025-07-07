@@ -1,7 +1,7 @@
 import { App, Notice, Plugin, PluginSettingTab, Setting, normalizePath } from 'obsidian';
 
 import { type ShoppingPluginSettings, DEFAULT_SETTINGS } from './settings';
-import { ingredientsPostProcessor } from './shoppingItems/postprocessor';
+import { ingredientsPostProcessor } from './shoppingBundle/postprocessor';
 
 import store from "./store";
 import { Item } from './types';

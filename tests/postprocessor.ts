@@ -1,5 +1,5 @@
 import { describe, expect, test } from '@jest/globals';
-import { parseShoppingList } from '../src/shoppingItems/utils';
+import { parseShoppingList } from '../src/shoppingBundle/utils';
 import { Item, type Result, Error, ok, err } from '../src/types';
 
 describe('parsing postprocessor list', () => {
