@@ -19,7 +19,6 @@ export function parseViewData(data: string): Result<BundleEntry[]> {
     for (let idx = 0; idx < lines.length; idx++) {
         let line = lines[idx];
         if (line.startsWith("-") || line.startsWith("+")) {
-            console.log(`Processing line: ${line}`);
             // Match the bundle name in the format like "- [ ] Bundle Name" or "+ [x] Bundle Name"
             const match = line.match(/^(-|\+) \[( |x)\] (.+)$/);
             if (!match) {

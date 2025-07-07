@@ -10,7 +10,12 @@ export function parseShoppingList(cnt: string): Result<Item[]> {
 
     for (let idx = 0; idx < lines.length; idx++) {
         let line = lines[idx];
-        const match = line.match(/^[-+*]?\s?(.+?)(:(.+?))?$/);
+        line.trim();
+        if (line.startsWith('-') || line.startsWith('+') || line.startsWith('*')) {
+            line = line.slice(1).trim(); // Remove leading -/+/*
+        }
+
+        const match = line.match(/^(.+?)(:(.+?))?$/);
         if (match) {
             if (match[1] == null) {
                 return err(`Found error at line ${idx + 1}: invalid item format: ${line}`);
