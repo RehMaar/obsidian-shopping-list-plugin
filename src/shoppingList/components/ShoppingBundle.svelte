@@ -20,6 +20,7 @@
 	}
 
 	function removeBundle(bundle: BundleEntry) {
+		stopModifing();
 		onRemove(bundle);
 	}
 

@@ -79,7 +79,7 @@
 	function cleanAll() {
 		new ConfirmModal(
 			plugin.app,
-			"Are you sure you want to clear all done bundles?",
+			"Are you sure you want to clear all bundles?",
 			() => {
 				entries = entries.filter((e) => e.done);
 				onSave(entries);
