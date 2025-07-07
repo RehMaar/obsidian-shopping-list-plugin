@@ -18,6 +18,7 @@
 		let any_item_empty = bundle.items.filter(
 			(item) => item.item.name.trim() !== "",
 		).length;
+		// TODO: notify that we cannot save an empty item
 		if (any_item_empty === 0) return;
 		onSave(bundle);
 	}

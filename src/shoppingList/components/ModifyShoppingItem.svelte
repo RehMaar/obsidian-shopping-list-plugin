@@ -4,6 +4,13 @@
 
 	export let item: ItemEntry;
 	export let removeItem: (item: ItemEntry) => void;
+
+	let name: string = item.item.name;
+	let amount: string =
+		item.item.amount == null ? "" : item.item.amount.toString();
+
+	$: item.item.name = name;
+	$: item.item.amount = amount == "" ? null : amount;
 </script>
 
 <ul class="item-detail">
@@ -17,13 +24,13 @@
 	<input
 		type="text"
 		class="item-entry-input"
-		bind:value={item.item.name}
+		bind:value={name}
 		placeholder="Name"
 	/>
 	<input
 		type="text"
 		class="item-entry-input"
-		bind:value={item.item.amount}
+		bind:value={amount}
 		placeholder="Amount"
 	/>
 	<button

@@ -4,7 +4,8 @@ export function bundleToString(entry: BundleEntry): string {
     let foldedMark = entry.folded ? "+" : "-";
     let bundleString = foldedMark + ` [${entry.done ? "x" : " "}] ${entry.name}\n`;
     for (const item of entry.items) {
-        bundleString += `\t- [${item.done ? "x" : " "}] ${item.item.name}: ${item.item.amount}\n`;
+        let amount = item.item.amount ? ` ${item.item.amount}` : "";
+        bundleString += `\t- [${item.done ? "x" : " "}] ${item.item.name}:` + amount + "\n";
     }
     return bundleString;
 }

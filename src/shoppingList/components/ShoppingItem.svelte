@@ -17,7 +17,9 @@
 		on:change={() => toggleDone(entry)}
 	/>
 	<span class="item-name">{entry.item.name}</span>
-	<span class="item-amount">{entry.item.amount}</span>
+	<span class="item-amount"
+		>{entry.item.amount == null ? "" : entry.item.amount}</span
+	>
 	<!-- </label> -->
 </ul>
 
