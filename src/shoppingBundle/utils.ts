@@ -1,3 +1,4 @@
+import { type HeadingCache } from 'obsidian';
 import { Item, type Result, ok, err, Error } from '../types';
 
 // Function to parse a shopping list from a string
@@ -31,4 +32,10 @@ export function parseShoppingList(cnt: string): Result<Item[]> {
         }
     }
     return ok(items);
+}
+
+export function findSectionName(headings: HeadingCache[], bundle_line_start: number): string | null {
+    let heading_idx = headings.findLastIndex((heading) => heading.level === 1 && heading.position.start.line < bundle_line_start);
+    let heading = headings[heading_idx ?? -1];
+    return heading?.heading || null;
 }

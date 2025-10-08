@@ -4,9 +4,10 @@ import { type ShoppingPluginSettings, DEFAULT_SETTINGS } from './settings';
 import { ingredientsPostProcessor } from './shoppingBundle/postprocessor';
 
 import store from "./store";
-import { Item } from './types';
+import { ItemsWithMeta } from './types';
 
 import { ShoppingListView, SHOPPING_LIST_VIEW_TYPE } from './shoppingList/view';
+import { findSectionName } from './shoppingBundle/utils';
 
 export default class ShoppingListPlugin extends Plugin {
 	// @ts-ignore
@@ -27,7 +28,8 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 
-	public async copyToFile(items: Item[]) {
+	/// Copy the item list (aka the bundle) into the shopping list file from the settings
+	public async copyToFile(items_meta: ItemsWithMeta) {
 		let dir = this.settings.shoppingListDir;
 		let file = this.settings.defaultShoppingListFileName;
 
@@ -38,6 +40,16 @@ export default class ShoppingListPlugin extends Plugin {
 		}
 		let projectName = currentFile.basename;
 
+		let cache = this.app.metadataCache.getFileCache(currentFile);
+		if (cache && cache?.headings) {
+			let sectionName = findSectionName(cache!.headings!, items_meta.bundle_start);
+			if (sectionName) {
+				projectName = projectName + ': ' + sectionName;
+			}
+		}
+
+
+		let items = items_meta.items;
 
 		const innerContent = items.map(item => `\t- [ ] ${item.name}: ${item.amount}`).join("\n");
 		const content = `- [ ] ${projectName}\n` + innerContent;

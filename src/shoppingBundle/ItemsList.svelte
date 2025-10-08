@@ -4,9 +4,9 @@
 
 	import store from "../store";
 	import type ShoppingListPlugin from "../main";
-	import { type Item, type Result, type Error } from "../types";
+	import { type ItemsWithMeta, type Result, type Error } from "../types";
 
-	export let items: Result<Item[]>;
+	export let items_with_meta: Result<ItemsWithMeta>;
 	let plugin: ShoppingListPlugin;
 	store.plugin.subscribe((p) => (plugin = p));
 
@@ -15,8 +15,8 @@
 			console.error("Plugin is not initialized.");
 			return;
 		}
-		if (items.success) {
-			plugin.copyToFile(items.value);
+		if (items_with_meta.success) {
+			plugin.copyToFile(items_with_meta.value);
 		} else {
 			new Notice("Unable to copy due to formatting errors.");
 		}
@@ -35,10 +35,10 @@
 	</header>
 
 	<div class="item-details">
-		{#if !items.success}
-			<span class="error-message">{items.error.message}</span>
+		{#if !items_with_meta.success}
+			<span class="error-message">{items_with_meta.error.message}</span>
 		{:else}
-			{#each items.value as item}
+			{#each items_with_meta.value.items as item}
 				<ul class="item-detail">
 					<span class="item-name">{item.name}</span>
 					{#if item.amount != null}

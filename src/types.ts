@@ -18,6 +18,14 @@ export function err(message: string): Result<never> {
     return { success: false, error: new Error(message) };
 }
 
+export function mapResult<T, U>(result: Result<T>, fn: (value: T) => U): Result<U> {
+    if (result.success) {
+        return ok(fn(result.value));
+    } else {
+        return err(result.error.message);
+    }
+}
+
 export class Item {
     name: string;
     amount: string | null;
@@ -66,5 +74,19 @@ export class BundleEntry {
 
     toggleFolded() {
         this.folded = !this.folded;
+    }
+}
+
+// Class to hold items along with its line number in the original note
+// to be able to find the section name later when the item is added to the shopping list
+//
+// It looks ugly but it's a kind of optimization to avoid calculating headers when not needed.
+export class ItemsWithMeta {
+    items: Item[];
+    bundle_start: number;
+
+    constructor(items: Item[], bundle_start: number) {
+        this.items = items;
+        this.bundle_start = bundle_start;
     }
 }
