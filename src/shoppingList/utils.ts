@@ -10,7 +10,7 @@ export function bundleToString(entry: BundleEntry): string {
     return bundleString;
 }
 
-// TODO: do it more percise
+// TODO: do it more precise
 export function parseViewData(data: string): Result<BundleEntry[]> {
     const lines = data.split("\n");
 

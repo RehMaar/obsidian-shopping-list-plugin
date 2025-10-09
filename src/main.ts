@@ -137,18 +137,6 @@ export default class ShoppingListPlugin extends Plugin {
 
 }
 
-class ExampleModal extends SuggestModal<string> {
-	getSuggestions(query: string): string[] {
-		return ['apple', 'banana', 'carrot'].filter(item => item.includes(query));
-	}
-	renderSuggestion(item: string, el: HTMLElement) {
-		el.setText(item);
-	}
-	onChooseSuggestion(item: string, evt: MouseEvent | KeyboardEvent) {
-		new Notice(`You chose ${item}`);
-	}
-}
-
 export class ShoppingPluginSettingTab extends PluginSettingTab {
 	plugin: ShoppingListPlugin;
 
@@ -163,8 +151,8 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 		containerEl.empty();
 
 		new Setting(containerEl)
-			.setName('Shopping list directory')
-			.setDesc("We'll store the list there. If nothing is specified, the list will be stored in the root of your vault")
+			.setName('Shopping list folder')
+			.setDesc("Where to store the active shopping list. If nothing is specified, the list will be stored in the root of your vault")
 			.addSearch(search => {
 				search.setValue(this.plugin.settings.shoppingListDir)
 					.setPlaceholder('Enter the folder name');
@@ -173,7 +161,7 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 				search.inputEl.onblur = async () => {
 					let value = search.getValue();
 					if (!this.isValidDir(value)) {
-						new Notice('Invalid folder name');
+						new Notice(`Invalid folder name: ${value}`);
 						return;
 					}
 					this.plugin.settings.shoppingListDir = value;
@@ -182,14 +170,14 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 			});
 
 		new Setting(containerEl)
-			.setName('Current shopping list file name')
-			.setDesc(`Set the filename for your shopping list. Keep it without a file extension, it will be added automatically`)
+			.setName('Active shopping list name')
+			.setDesc(`Set the name for the shopping list file. File extension will be added automatically`)
 			.addText(text => text
 				.setPlaceholder('Enter the name')
 				.setValue(this.plugin.settings.defaultShoppingListFileName)
 				.onChange(async (value) => {
 					if (!this.isValidFile(value)) {
-						new Notice(`Name ${value} isn't a valid`);
+						new Notice(`Invalid file name: ${value}`);
 						return;
 					}
 					this.plugin.settings.defaultShoppingListFileName = value;
@@ -198,7 +186,7 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 
 		new Setting(containerEl)
 			.setName('Add the shopping list ribbon')
-			.setDesc('Show a ribbon in the editor for quick access to the shopping list. Requires a restart')
+			.setDesc('Show the ribbon for quick access. Requires a restart')
 			.addToggle(toggle => toggle
 				.setValue(this.plugin.settings.showShoppingListRibbon)
 				.onChange(async (value) => {
