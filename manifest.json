@@ -3,7 +3,7 @@
 	"name": "Shopping List Plugin",
 	"version": "1.0.0",
 	"minAppVersion": "0.18.0",
-	"description": "Shopping list plugin for Obsidian",
+	"description": "Shopping list plugin with easy UI",
 	"author": "RehMaar",
 	"isDesktopOnly": false
 }
