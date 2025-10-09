@@ -36,6 +36,6 @@ export function parseShoppingList(cnt: string): Result<Item[]> {
 
 export function findSectionName(headings: HeadingCache[], bundle_line_start: number): string | null {
     let heading_idx = headings.findLastIndex((heading) => heading.level === 1 && heading.position.start.line < bundle_line_start);
-    let heading = headings[heading_idx ?? -1];
+    const heading = headings[heading_idx ?? -1];
     return heading?.heading || null;
 }

@@ -69,12 +69,13 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 	getProjectName(items_with_meta: ItemsWithMeta): string | null {
-		let currentFile = this.app.workspace.getActiveFile();
+		const currentFile = this.app.workspace.getActiveFile();
 		if (!currentFile) {
 			return null;
 		}
+
 		let projectName = currentFile.basename;
-		let sectionName = this.getSectionName(currentFile, items_with_meta);
+		const sectionName = this.getSectionName(currentFile, items_with_meta);
 		if (sectionName) {
 			projectName += `: ${sectionName}`;
 		}
@@ -82,21 +83,21 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 	getSectionName(currentFile: TFile, items_meta: ItemsWithMeta): string | null {
-		let cache = this.app.metadataCache.getFileCache(currentFile);
+		const cache = this.app.metadataCache.getFileCache(currentFile);
 		if (cache && cache?.headings) {
-			let sectionName = findSectionName(cache!.headings!, items_meta.bundle_start);
+			const sectionName = findSectionName(cache!.headings!, items_meta.bundle_start);
 			return sectionName;
 		}
 		return null;
 	}
 
 	getCurrentShoppingListPath(): string {
-		let dir = this.settings.shoppingListDir;
-		let file = this.settings.defaultShoppingListFileName;
+		const dir = this.settings.shoppingListDir;
+		const file = this.settings.defaultShoppingListFileName;
 
 		if (dir !== '') {
 			// Ensure the directory exists
-			let listDir = this.app.vault.getFolderByPath(dir);
+			const listDir = this.app.vault.getFolderByPath(dir);
 			if (!listDir) {
 				this.app.vault.createFolder(dir);
 			}
@@ -114,7 +115,7 @@ export default class ShoppingListPlugin extends Plugin {
 	}
 
 	async openOrCreateCurrentShoppingList() {
-		let filePath = this.getCurrentShoppingListPath();
+		const filePath = this.getCurrentShoppingListPath();
 		let file = this.app.vault.getFileByPath(filePath);
 		if (!file) {
 			file = await this.app.vault.create(filePath, '');
@@ -123,7 +124,7 @@ export default class ShoppingListPlugin extends Plugin {
 
 		this.app.workspace.detachLeavesOfType(SHOPPING_LIST_VIEW_TYPE);
 
-		let leaf = this.app.workspace.getLeaf('tab');
+		const leaf = this.app.workspace.getLeaf('tab');
 
 		await leaf.openFile(file, { active: true });
 		await leaf.setViewState({
@@ -159,7 +160,7 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 				new FolderSuggest(this.plugin.app, search.inputEl, 10);
 				// To check the name when it was entered fully
 				search.inputEl.onblur = async () => {
-					let value = search.getValue();
+					const value = search.getValue();
 					if (!this.isValidDir(value)) {
 						new Notice(`Invalid folder name: ${value}`);
 						return;
@@ -236,9 +237,7 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 	}
 
 	isValidFile(value: string): boolean {
-		let targetFilename = value + '.' + this.plugin.settings.fileExtension;
+		const targetFilename = value + '.' + this.plugin.settings.fileExtension;
 		return isValidFilename(targetFilename);
 	}
-
-
 }
