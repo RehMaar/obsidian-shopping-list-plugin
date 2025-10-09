@@ -31,6 +31,7 @@
 		"svelte-preprocess": "^5.0.4",
 		"ts-jest": "^29.4.0",
 		"tslib": "2.4.0",
-		"typescript": "^5.8.3"
+		"typescript": "^5.8.3",
+		"valid-filename": "4.0.0"
 	}
 }
