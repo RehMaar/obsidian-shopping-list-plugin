@@ -19,6 +19,16 @@
 		currentItemName = "";
 		currentItemAmount = "";
 	}
+
+	function processEnter(
+		event: KeyboardEvent,
+		currentItemName: string,
+		currentItemAmount: string,
+	) {
+		if (event.key == "Enter") {
+			acceptItemLocal(currentItemName, currentItemAmount);
+		}
+	}
 </script>
 
 <li class="item-detail add-item-entry-row">
@@ -29,11 +39,17 @@
 		tabindex="-1"
 		style="pointer-events: none"
 	/>
+
+	<!-- We ignore this attribute because it only appears when adding and item and it very convenient -->
+	<!-- svelte-ignore a11y-autofocus -->
 	<input
 		type="text"
 		class="item-entry-input"
 		bind:value={currentItemName}
+		on:keydown={(e) => processEnter(e, currentItemName, "")}
 		placeholder="Name"
+		required
+		autofocus
 	/>
 	{#if currentItemName.trim() !== ""}
 		<input
@@ -42,8 +58,7 @@
 			bind:value={currentItemAmount}
 			placeholder="Amount"
 			on:keydown={(e) =>
-				e.key === "Enter" &&
-				acceptItemLocal(currentItemName, currentItemAmount)}
+				processEnter(e, currentItemName, currentItemAmount)}
 		/>
 		<button
 			class="button"
