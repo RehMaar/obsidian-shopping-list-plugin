@@ -2,7 +2,7 @@
 	"id": "shopping-list-plugin",
 	"name": "Shopping List Plugin",
 	"version": "1.0.0",
-	"minAppVersion": "0.18.0",
+	"minAppVersion": "1.9.14",
 	"description": "Shopping list plugin with easy UI",
 	"author": "RehMaar",
 	"isDesktopOnly": false
