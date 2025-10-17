@@ -86,6 +86,18 @@
 			},
 		).open();
 	}
+
+	function isDoneOrPartiallyDone(bundle: BundleEntry): boolean {
+		return bundle.done || bundle.items.some((item) => item.done);
+	}
+
+	function showCheckedItems(item: ItemEntry): boolean {
+		return item.done;
+	}
+
+	function showUncheckedItems(item: ItemEntry): boolean {
+		return !item.done;
+	}
 </script>
 
 <div class="shopping-list-container">
@@ -122,6 +134,7 @@
 					onFold={toggleFold}
 					onRemove={removeBundle}
 					onItemDone={toggleItemDone}
+					filterItems={showUncheckedItems}
 				/>
 			{/if}
 		{/each}
@@ -155,13 +168,14 @@
 
 			{#if !isDoneFolded}
 				{#each entries as bundle}
-					{#if bundle.done}
+					{#if isDoneOrPartiallyDone(bundle)}
 						<ShoppingBundle
 							{bundle}
 							onDone={toggleDone}
 							onFold={toggleFold}
 							onRemove={removeBundle}
 							onItemDone={toggleItemDone}
+							filterItems={showCheckedItems}
 						/>
 					{/if}
 				{/each}

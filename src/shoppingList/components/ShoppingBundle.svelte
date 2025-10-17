@@ -8,6 +8,7 @@
 	export let onFold: (bundle: BundleEntry) => void;
 	export let onRemove: (bundle: BundleEntry) => void;
 	export let onItemDone: (itemEntry: ItemEntry) => void;
+	export let filterItems: (item: ItemEntry) => boolean;
 
 	export let bundle;
 
@@ -37,7 +38,7 @@
 		modifyingBundle = true;
 	}
 
-	function stopModifing() {
+	function stopModifying() {
 		modifyingBundle = false;
 	}
 </script>
@@ -47,7 +48,7 @@
 		<ModifyShoppingBundle
 			{bundle}
 			onSave={(_updatedBundle) => {
-				stopModifing();
+				stopModifying();
 			}}
 			onRemove={removeBundle}
 		/>
@@ -62,8 +63,10 @@
 		<!-- Inner List -->
 		{#if !bundle.folded}
 			<ul class="item-details">
-				{#each bundle.items as entry, entry_index}
-					<ShoppingListItem {entry} onDone={toggleItemDone} />
+				{#each bundle.items as entry}
+					{#if filterItems(entry)}
+						<ShoppingListItem {entry} onDone={toggleItemDone} />
+					{/if}
 				{/each}
 			</ul>
 		{/if}

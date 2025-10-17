@@ -195,7 +195,7 @@ export class ShoppingPluginSettingTab extends PluginSettingTab {
 					await this.plugin.updateSettings();
 				}));
 		/*
-		// TODO: requires restart but changes are accepted immediately
+		// FIXME: requires restart but changes are accepted immediately
 		new Setting(containerEl)
 			.setName('Shopping list file extension')
 			.setDesc('Set the file extension for your shopping list files. Keep it one word, please. Requires a restart')
