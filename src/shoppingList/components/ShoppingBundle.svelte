@@ -7,26 +7,17 @@
 	export let onDone: (bundle: BundleEntry) => void;
 	export let onFold: (bundle: BundleEntry) => void;
 	export let onRemove: (bundle: BundleEntry) => void;
-	export let onItemDone: (itemEntry: ItemEntry) => void;
+	export let onItemDone: (
+		bundleEntry: BundleEntry,
+		itemEntry: ItemEntry,
+	) => void;
 	export let filterItems: (item: ItemEntry) => boolean;
 
-	export let bundle;
-
-	function toggleDone(bundle: BundleEntry) {
-		onDone(bundle);
-	}
-
-	function toggleFold(bundle: BundleEntry) {
-		onFold(bundle);
-	}
+	export let bundle: BundleEntry;
 
 	function removeBundle(bundle: BundleEntry) {
-		stopModifing();
+		stopModifying();
 		onRemove(bundle);
-	}
-
-	function toggleItemDone(itemEntry: ItemEntry) {
-		onItemDone(itemEntry);
 	}
 
 	let modifyingBundle = false;
@@ -40,6 +31,10 @@
 
 	function stopModifying() {
 		modifyingBundle = false;
+	}
+
+	function onItemFromBundleDone(itemEntry: ItemEntry) {
+		onItemDone(bundle, itemEntry);
 	}
 </script>
 
@@ -55,8 +50,8 @@
 	{:else}
 		<ShoppingBundleHeader
 			{bundle}
-			{toggleDone}
-			{toggleFold}
+			toggleDone={onDone}
+			toggleFold={onFold}
 			onModify={modifyBundle}
 		/>
 
@@ -65,7 +60,10 @@
 			<ul class="item-details">
 				{#each bundle.items as entry}
 					{#if filterItems(entry)}
-						<ShoppingListItem {entry} onDone={toggleItemDone} />
+						<ShoppingListItem
+							{entry}
+							onDone={onItemFromBundleDone}
+						/>
 					{/if}
 				{/each}
 			</ul>

@@ -65,11 +65,15 @@ export class BundleEntry {
         this.folded = folded;
     }
 
-    toggleDone() {
-        this.done = !this.done;
+    toggleDoneAll() {
+        this.toggleDone();
         this.items.map(item => {
             item.done = this.done;
         });
+    }
+
+    toggleDone() {
+        this.done = !this.done;
     }
 
     toggleFolded() {

@@ -39,14 +39,17 @@
 	}
 
 	function toggleDone(entry: BundleEntry) {
-		entry.toggleDone();
+		entry.toggleDoneAll();
 
 		refreshPage(); // Refresh the page to reflect changes
 		onSave(entries);
 	}
 
-	function toggleItemDone(itemEntry: ItemEntry) {
+	function toggleItemDone(bundleEntry: BundleEntry, itemEntry: ItemEntry) {
 		itemEntry.toggleDone();
+		if (bundleEntry.done && !itemEntry.done) {
+			bundleEntry.toggleDone();
+		}
 
 		refreshPage(); // Refresh the page to reflect changes
 		onSave(entries);

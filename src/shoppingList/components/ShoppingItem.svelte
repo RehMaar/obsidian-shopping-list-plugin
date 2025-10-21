@@ -4,17 +4,13 @@
 	export let entry;
 
 	export let onDone: (item_entry: ItemEntry) => void;
-
-	function toggleDone(item_entry: ItemEntry) {
-		onDone(item_entry);
-	}
 </script>
 
 <ul class="item-detail">
 	<input
 		type="checkbox"
 		checked={entry.done}
-		on:change={() => toggleDone(entry)}
+		on:change={() => onDone(entry)}
 	/>
 	<span class="item-name">{entry.item.name}</span>
 	<span class="item-amount"
