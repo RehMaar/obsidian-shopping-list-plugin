@@ -7,4 +7,4 @@ then
 fi
 
 
-npm run build && adb push manifest.json main.js styles.css "$MOBILE_STORAGE/.obsidian/plugins/shopping-list-plugin/"
+npm run build && adb push manifest.json main.js "$MOBILE_STORAGE/.obsidian/plugins/shopping-list-plugin/"

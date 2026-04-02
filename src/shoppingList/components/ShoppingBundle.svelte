@@ -23,9 +23,6 @@
 	let modifyingBundle = false;
 
 	function modifyBundle(bundle: BundleEntry) {
-		// This function can be used to open a modal for renaming the bundle
-		// For now, it just logs the bundle name
-		console.log("Modify bundle:", bundle.name);
 		modifyingBundle = true;
 	}
 

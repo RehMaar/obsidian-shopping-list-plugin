@@ -36,7 +36,7 @@
 	<ModifyShoppingBundleHeader {bundle} onSave={saveBundle} {onRemove} />
 
 	<ul class="item-details">
-		{#each bundle.items as item}
+		{#each bundle.items as item (item.item.id)}
 			<ModifyShoppingItem {item} {removeItem} />
 		{/each}
 

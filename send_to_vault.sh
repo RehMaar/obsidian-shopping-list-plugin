@@ -31,4 +31,4 @@ else
 fi
 
 
-npm run build && cp main.js styles.css manifest.json "$TARGET_DIR"
+npm run build && cp main.js manifest.json "$TARGET_DIR"

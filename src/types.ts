@@ -27,11 +27,13 @@ export function mapResult<T, U>(result: Result<T>, fn: (value: T) => U): Result<
 }
 
 export class Item {
+    id: string;
     name: string;
     amount: string | null;
     type: string | null;
 
     constructor(name: string, amount: string | null = null, type: string | null = null) {
+        this.id = crypto.randomUUID();
         this.name = name;
         this.amount = amount;
         this.type = type;

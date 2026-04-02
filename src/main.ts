@@ -26,6 +26,15 @@ export default class ShoppingListPlugin extends Plugin {
 		this.registerView(SHOPPING_LIST_VIEW_TYPE, (leaf) => new ShoppingListView(leaf));
 		this.registerExtensions([this.settings.fileExtension], SHOPPING_LIST_VIEW_TYPE);
 
+		/*
+		this.registerEvent(this.app.workspace.on('file-menu', (menu, file, source, leaf) => {
+			if (source == 'file-explorer-context-menu' && file instanceof TFile) {
+				console.log("Adding recipe to the file");
+				menu.addItem(() => {});
+			}
+		}));
+		*/
+
 		if (this.settings.showShoppingListRibbon) {
 			this.addRibbonIcon('shopping-cart', 'Open shopping list', (evt: MouseEvent) => {
 				this.openOrCreateCurrentShoppingList();
