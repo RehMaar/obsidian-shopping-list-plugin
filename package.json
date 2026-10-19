@@ -13,7 +13,6 @@
 	"license": "MIT",
 	"devDependencies": {
 		"@jest/globals": "^29.7.0",
-		"@lucide/svelte": "^0.514.0",
 		"@tsconfig/svelte": "^5.0.4",
 		"@types/jest": "^30.0.0",
 		"@types/node": "^16.11.6",
