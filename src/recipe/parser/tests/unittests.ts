@@ -1,23 +1,24 @@
 import { describe, expect, test } from '@jest/globals';
-import { parseAmount, parseRecordedItem, parseLink } from '../inner';
+import { parseAmount, parseRecordedItem, tryParseLink } from '../inner';
 import { parse } from '../parser';
 import { Amount, Ratio, RawItem, Recipe, RecipeLink, RecipeRecord, RecordedItem } from '../../types';
 import { ParseError, ParseRecordError } from '../types';
 
 describe('parsing link', () => {
     test('parse wikilinks', () => {
-        expect(parseLink("[[Test]]")).toEqual({link: "Test", name: null});
-        expect(parseLink("[[^Test]]")).toEqual({link: "^Test", name: null});
-        expect(parseLink("[[Test|TestName]]")).toEqual({link: "Test", name: "TestName"});
-        expect(parseLink("[[Test|TestName#Name]]")).toEqual({link: "Test", name: "TestName#Name"});
-        expect(parseLink("[[Test#Section|TestName]]")).toEqual({link: "Test#Section", name: "TestName"});
+        expect(tryParseLink("[[Test]]")).toEqual({ result: {link: "Test", name: null}, rest: ""});
+        expect(tryParseLink("[[^Test]]")).toEqual({ result: {link: "^Test", name: null}, rest: ""});
+        expect(tryParseLink("[[Test|TestName]]")).toEqual({ result: {link: "Test", name: "TestName"}, rest: ""});
+        expect(tryParseLink("[[Test|TestName#Name]]")).toEqual({ result: {link: "Test", name: "TestName#Name"}, rest: ""});
+        expect(tryParseLink("[[Test#Section|TestName]]")).toEqual({ result: {link: "Test#Section", name: "TestName"}, rest: ""});
+        expect(tryParseLink("[[Untitled/Test Note#^ff2a77]]")).toEqual({ result: {link: "Untitled/Test Note#^ff2a77", name: null}, rest: ""});
     });
 
     test('parse markdown links', () => {
-        expect(parseLink("[Linkname](Link)")).toEqual({link: "Link", name: "Linkname"});
-        expect(parseLink("[Linkname](Link#Section)")).toEqual({link: "Link#Section", name: "Linkname"});
-        expect(parseLink("[TD](TODO(hello))")).toEqual({link: "TODO(hello)", name: "TD"});
-        expect(parseLink("[TD]([TODO|(hello)])")).toEqual({link: "[TODO|(hello)]", name: "TD"});
+        expect(tryParseLink("[Linkname](Link)")).toEqual({ result: {link: "Link", name: "Linkname"}, rest: ""});
+        expect(tryParseLink("[Linkname](Link#Section)")).toEqual({ result: {link: "Link#Section", name: "Linkname"}, rest: ""});
+        expect(tryParseLink("[TD](TODO(hello))")).toEqual({ result: {link: "TODO(hello)", name: "TD"}, rest: ""});
+        expect(tryParseLink("[TD]([TODO|(hello)])")).toEqual({ result: {link: "[TODO|(hello)]", name: "TD"}, rest: ""});
     });
 });
 
@@ -158,8 +159,18 @@ describe('parsing record', () => {
                 new RecipeLink("Test", "Linkname", new Ratio(1, 2)), 
                 true
             ));
+        expect(parseRecordedItem("- [[Untitled/Test Note#^ff2a77]], 1"))
+            .toEqual(new RecordedItem(
+                new RecipeLink("Untitled/Test Note#^ff2a77", null, 1), 
+                true
+            ));
+        expect(parseRecordedItem("- [[Untitled/Test Note#^ff2a77]], 1 #the more the better"))
+            .toEqual(new RecordedItem(
+                new RecipeLink("Untitled/Test Note#^ff2a77", null, 1), 
+                true,
+                "the more the better"
+            ));
     });
-
     
     test("test records with markdown links", () => {
         expect(parseRecordedItem("- [Testname](Test)"))

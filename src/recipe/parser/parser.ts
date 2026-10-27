@@ -18,7 +18,7 @@ import { ParseError, ParseErrorType, ParseRecordError } from "./types";
  * - the last , in the line (before #) is the start of an amount
  * 
  */
-export function parse(text: string): { recipe: Recipe | null, errors: ParseError[]} {
+export function parse(text: string): { recipe: Recipe, errors: ParseError[]} {
 	var lines = text.split('\n');
 	var portions = 1;
 	var items = [];

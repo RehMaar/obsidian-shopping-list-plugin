@@ -44,8 +44,8 @@ export function parseAmount(amount_str: string): Amount  | string | null {
 }
 
 // Format: [[Link(|Linkname)?]]
-function tryParseWikilink(line: string): {link: string, name: string | null } | null {
-    let matcher = line.trim().match(/^\[\[(.*)\]\]/);
+function tryParseWikilink(line: string): { result: {link: string, name: string | null }, rest: string }| null {
+    let matcher = line.trim().match(/^\[\[(.*)\]\](.*)/);
     if (matcher) {
         let linkName = null;
         let link = matcher[1];
@@ -54,24 +54,24 @@ function tryParseWikilink(line: string): {link: string, name: string | null } | 
             linkName = link.slice(splitter_index + 1);
             link = link.slice(0, splitter_index);
         }
-        return { link: link, name: linkName};
+        return { result: { link: link, name: linkName}, rest: matcher[2]};
     }
 
     return null;
 }
 
 // Format: [linkname](link)
-function tryParseMarkdownLinks(line: string): { link: string, name: string } | null {
-    let matcher = line.trim().match(/^\[(.+)\]\((.+)\)$/);
+function tryParseMarkdownLinks(line: string): {result: { link: string, name: string }, rest: string } | null {
+    let matcher = line.trim().match(/^\[(.+)\]\((.+)\)(.*)/);
     if (matcher) {
         let linkName = matcher[1];
         let link = matcher[2];
-        return { link: link, name: linkName };
+        return {result: { link: link, name: linkName }, rest: matcher[3] };
     }
     return null;
 }
 
-export function parseLink(line: string): { link: string, name: string | null } | null {
+export function tryParseLink(line: string): {result: { link: string, name: string | null }, rest: string} | null {
     let wikilink = tryParseWikilink(line);
     if (wikilink) {
         return wikilink;
@@ -79,22 +79,26 @@ export function parseLink(line: string): { link: string, name: string | null } |
     return tryParseMarkdownLinks(line);
 }
 
-// `<recipe link>, <portions: 1 or 1/2> 
-export function parseRecipeLink(name: string, amount: string | null): RecipeLink | ParseRecordError | null {
-    let link = parseLink(name);
-    if (link) {
-        let portions: AmountType = 1;
-        if (amount) {
-            let result = parseAmountType(amount);
-            if (result) {
-                portions = result;
-            } else {
-                return new ParseRecordError(ParseErrorType.WrongPortionsFormat);
-            }
+function splitAmountAndComment(line: string): { start: string, amount_str: string | null, comment: string | null} {
+    let comment = null;
+    let last_hash_index = line.lastIndexOf('#');
+	if (last_hash_index === -1) {
+		last_hash_index = line.length;
+	} else {
+		comment = line.slice(last_hash_index + 1).trim();
+        if (comment == "") {
+            comment = null;
         }
-        return new RecipeLink(link.link, link.name, portions);
+	}
+	let line_without_comment = line.slice(0, last_hash_index);
+    let name = line_without_comment.trim();
+    let amount_str = null;
+	let amount_index = line_without_comment.lastIndexOf(',');
+    if (amount_index != -1) {
+	    name = line_without_comment.slice(0, amount_index).trim();
+        amount_str = line_without_comment.slice(amount_index + 1).trim();
     }
-    return null;
+    return { start: name, amount_str: amount_str, comment: comment};
 }
 
 // 
@@ -110,40 +114,32 @@ export function parseRecordedItem(line: string): RecordedItem | ParseRecordError
     var should_be_bought = line.startsWith('-');
 
     line = line.slice(1).trim();
-	var comment = null;
-	// find the last # in the line, if any
-	var last_hash_index = line.lastIndexOf('#');
-	if (last_hash_index === -1) {
-		last_hash_index = line.length;
-	} else {
-		comment = line.slice(last_hash_index + 1).trim();
-        if (comment == "") {
-            comment = null;
-        }
-	}
-	var line_without_comment = line.slice(0, last_hash_index);
-    var name = line_without_comment.trim();
-    var amount_str = null;
-	var amount_index = line_without_comment.lastIndexOf(',');
-    if (amount_index != -1) {
-	    name = line_without_comment.slice(0, amount_index).trim();
-        amount_str = line_without_comment.slice(amount_index + 1).trim();
-    }
 
-    var item = null;
-    let result = parseRecipeLink(name, amount_str);
-    if (result) {
-        if (result instanceof ParseRecordError) {
-            return result;
+    let tryLink = tryParseLink(line);
+    if (tryLink) {
+        let name = tryLink.result.name;
+        let link = tryLink.result.link;
+        let { start, amount_str, comment } = splitAmountAndComment(tryLink.rest);
+        if (start != "") {
+            return new ParseRecordError(ParseErrorType.WrongFormat);
         }
-        item = result;
-    } else {
-        let amount = null;
+        let portions: AmountType = 1;
         if (amount_str) {
-            amount = parseAmount(amount_str);
+            let result = parseAmountType(amount_str);
+            if (result) {
+                portions = result;
+            } else {
+                return new ParseRecordError(ParseErrorType.WrongPortionsFormat);
+            }
         }
-	    item = new RawItem(name, amount);
+        return new RecordedItem(new RecipeLink(link, name, portions), should_be_bought, comment);
     }
 
-	return new RecordedItem(item, should_be_bought, comment);
+    let { start, amount_str, comment } = splitAmountAndComment(line); 
+    let amount = null;
+    if (amount_str) {
+        amount = parseAmount(amount_str);
+    }
+
+    return new RecordedItem(new RawItem(start.trim(), amount), should_be_bought, comment);
 }
